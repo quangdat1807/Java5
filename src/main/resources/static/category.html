@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="Utf-8">
+<title>Insert title here</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+</head>
+<body>
+	<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			  <span aria-hidden="true">&times;</span>
+			</button>
+		  </div>
+		  <div class="modal-body">
+			<form id="editForm"></form>
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			<button type="button" class="btn btn-primary" id="save">Save changes</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+	<button id="them">Them</button>
+	<table>
+		<thead>
+			<tr>
+				<th>id</th>
+				<th>Tên</th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody id="tableBody">
+		</tbody>
+	</table>
+	<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+	<script type="text/javascript">
+		var url = "api/categories";
+		var rowTemplate = "{{#each categories}}"
+							+"<tr>"
+							+	'<td>{{categoryId}}</td>'
+							+	'<td>{{name}}</td>'
+							+	'<td><button class="edit" c-id="{{categoryId}}">Edit</td>'
+							+	'<td><button class="delete" c-id="{{categoryId}}">Delete</td>'
+							+"</tr>"
+						+"{{/each}}";
+		var rowHbs = Handlebars.compile(rowTemplate);
+		function loadList() {
+			fetch(url).then(res => res.json())	
+				.then(data => {
+					var rows = rowHbs({ categories: data });
+					$("#tableBody").html(rows);
+					bindEvent();
+					bindClick();
+				});
+		}
+		loadList(); 
+		
+		function bindEvent() {
+			$(".delete").click(function() {
+				deleteCategory($(this));
+			});
+		}
+		var insertModal = new bootstrap.Modal(document.getElementById('editModal'), {
+			  keyboard: false
+			});
+		$("#them").click(function() {
+			insertModal.show();
+			var insertForm = '<div class="mb-3">'
+	               +	'<label for="c-Name" class="form-label">Name</label>'
+	  			   +	'<input name="name" value="" class="form-control" id="c-Name" placeholder="Name">'
+					+   '</div>';
+					
+			$("#editForm").html(insertForm);
+		});
+		
+		function bindClick() {
+			$(".edit").click(function() {
+				var id = $(this).attr("c-id");
+				
+				fetch(url + "/" + id)
+				.then(res => res.json())
+				.then(data => {
+					var categoryHtml = editTemplateHbs(data);
+					$("#editForm").html(categoryHtml);
+				})
+			})
+		}
+		
+		$("#save").click(function() {
+			var category = FormDataJson.formToJson(document.querySelector("form"));
+			var editOption = {
+		        method: 'PUT',
+		        headers: {
+		            'Content-Type': 'application/json',
+		      	},
+		        body: JSON.stringify(category)
+			};
+			category = fetch(url, editOption)
+				.then(res => res.json())
+				.then(data => {
+					loadList();
+				});
+				inserModal.hide();
+			});
+		
+		//delete
+		function deleteCategory($button) {
+			var id = $button.attr("c-id");
+			var deleteOption = {
+				method: 'delete',
+				headers: {
+			        'Content-Type': 'application/json',
+			    }
+			};
+			Category = fetch(url + "/" + id, deleteOption)
+			.then(res => {
+				loadList();
+			});
+		}
+		</script>
+</body>
+</html>

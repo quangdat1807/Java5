@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+		<table>
+		<thead>
+			<tr>
+				<th>Ten</th>
+				<th>Diem</th>
+				<th>Gioi Tinh</th>
+			</tr>
+		</thead>
+		<tbody>
+		    <tr th:each="category,rowStat : ${api}">
+		        <td th:text="${rowStat.index + 1}"></td>
+		        <td th:text="${product.getName()}"></td>
+		        <td th:text="${product.getPrice()}"></td>
+		        <td th:text="${product.getManufacture()}"></td>
+		        <td><a th:href="@{/product/{id}/edit(id=${product.getId()})}">edit</a></td>
+		        <td><a th:href="@{/product/{id}/delete(id=${product.getId()})}">delete</a></td>
+		        <td><a th:href="@{/product/{id}/view(id=${product.getId()})}">view</a></td>
+		    </tr>
+    	</tbody>
+		
+	</table>
+</body>
+</html>

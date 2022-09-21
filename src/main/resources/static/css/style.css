@@ -1,0 +1,12 @@
+
+.container {
+	padding-right: 250px;
+	padding-left: 250px;
+}
+
+.validt {
+	color: red;
+	font-size: 11px;
+	text-align: center;
+}
+
